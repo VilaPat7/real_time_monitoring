@@ -1,0 +1,67 @@
+version: '3.7'
+services:
+  cadvisor:
+    image: google/cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - "5005:8080"
+    networks:
+      - project_network
+      
+  prometheus:
+    image: prom/prometheus
+    volumes:
+      - /home/nika/study/SNA/project/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - project_network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - project_network
+
+  alertmanager:
+    image: prom/alertmanager
+    volumes:
+      - /home/nika/study/SNA/project/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    ports:
+      - "9093:9093"
+    networks:
+      - project_network
+
+  blackbox_exporter:
+    image: prom/blackbox-exporter
+    ports:
+      - "9115:9115"
+    networks:
+      - project_network
+
+  node_exporter:
+    image: prom/node-exporter
+    ports:
+      - "9100:9100"
+    networks:
+      - project_network
+
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - /home/nika/study/SNA/project/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - project_network
+
+networks:
+  project_network:
+    driver: bridge
+    internal: false
+
