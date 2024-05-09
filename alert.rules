@@ -1,0 +1,57 @@
+groups:
+- name: performance
+  rules:
+  - alert: HighCPUUsage
+    expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High CPU usage detected"
+      description: "CPU usage is above 80% over the last 5 minutes."
+
+  - alert: HighMemoryUsage
+    expr: (node_memory_MemTotal_bytes - node_memory_MemFree_bytes - node_memory_Cached_bytes - node_memory_Buffers_bytes) / node_memory_MemTotal_bytes * 100 > 80
+    for: 5m
+    labels:
+      severity: critical
+    annotations:
+      summary: "High memory usage detected"
+      description: "Memory usage exceeds 80% of total available memory for the last 5 minutes."
+
+  - alert: ServiceDown
+    expr: probe_success{job="blackbox"} == 0
+    for: 2m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Service is down"
+      description: "The service {{ $labels.instance }} is down."
+
+  - alert: HighResponseTime
+    expr: probe_duration_seconds{job="blackbox"} > 2
+    for: 1m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High response time"
+      description: "Response time for {{ $labels.instance }} is higher than 2 seconds."
+
+  - alert: HighNetworkTraffic
+    expr: rate(node_network_receive_bytes_total{device!="lo"}[5m]) > 50000000
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "High network traffic detected"
+      description: "High network traffic detected on interface {{ $labels.device }}. Traffic exceeds 50 MB/sec."
+
+  - alert: ContainerDown
+    expr: changes(container_last_seen{image!=""}[10m]) < 1
+    for: 10m
+    labels:
+      severity: critical
+    annotations:
+      summary: "Container down"
+      description: "A container has been down for more than 10 minutes. Container: {{ $labels.container_label_com_docker_compose_service }}"
+
