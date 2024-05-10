@@ -7,16 +7,12 @@ global:
   smtp_require_tls: true
 
 route:
+  group_by: ['alertname']
   receiver: 'email-notifications'
   repeat_interval: 5m
-  routes:
-    - match:
-        severity: critical
-      receiver: email-notifications
 
 receivers:
 - name: 'email-notifications'
   email_configs:
   - to: 'recipient-email@example.com'
     send_resolved: true
-    html: '<html><body><h1>Alert: {{ .Status }}</h1><p>{{ .CommonAnnotations.description }}</p></body></html>'
