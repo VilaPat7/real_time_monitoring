@@ -54,6 +54,7 @@ services:
     command:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
       - '--storage.path=/var/lib/alertmanager'
+      - '--web.external-url=http://localhost:9093'
     networks:
       - project_project_network
 
